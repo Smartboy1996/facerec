@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+  <display-name></display-name>
+  <servlet>
+    <servlet-name>LoginVerify</servlet-name>
+    <servlet-class>com.cxy.LoginVerify</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>SignupVerify</servlet-name>
+    <servlet-class>com.cxy.SignupVerify</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ValiImageServlet</servlet-name>
+    <servlet-class>com.cxy.ValiImageServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginVerify</servlet-name>
+    <url-pattern>/servlet/LoginVerify</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>SignupVerify</servlet-name>
+    <url-pattern>/servlet/SignupVerify</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ValiImageServlet</servlet-name>
+    <url-pattern>/servlet/ValiImageServlet</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>login_with_facerec.html</welcome-file>
+  </welcome-file-list>
+</web-app>

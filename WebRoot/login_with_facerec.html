@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+    	<title>人脸识别登录</title>
+    	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    	<script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+    	<script type="text/javascript">
+    		$(document).ready(function(){
+    			// 获取媒体方法（旧方法）
+    			navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMeddia || navigator.msGetUserMedia;
+
+    			var canvas = document.querySelector('canvas'),
+        			context = canvas.getContext('2d'),
+        			video = document.querySelector('video'),
+        			upload = document.querySelector('#upload'),
+        			mediaStreamTrack;
+    			// 使用新方法打开摄像头
+    			if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        			navigator.mediaDevices.getUserMedia({
+            			audio: false,
+            			video: true
+        			}).then(function(stream) {
+            			//console.log(stream);
+            			mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
+            			video.src = (window.URL || window.webkitURL).createObjectURL(stream);
+            			video.play();
+        			}).catch(function(err) {
+            			console.log(err);
+        			})
+    			}
+    		// 截取图像并上传  		
+    		upload.addEventListener('click', function() {
+    				var character=$('input:radio:checked').val();
+    				if (character==null){
+    					alert("请选择身份后登陆!~");
+    					return;
+    				}
+    				context.drawImage(video, 0, 0, 320, 180);
+        			jQuery.post('servlet/LoginVerify', {
+            			snapData: canvas.toDataURL('image/png')
+        			}).done(function(rs) {
+								if(rs=="not_find_this_face"){
+									alert("用户尚未注册");
+								}else if(rs=="not_find_face"){
+									alert("没有检测到人脸");
+								}else{
+									alert("识别成功:欢迎您,"+rs);
+									var link="user_page.html"+'?username='+rs+'&character='+character;
+									window.location.href=link;
+								}	
+       	 			}).fail(function() {
+            			alert("服务器错误");
+        			});
+    			}, false);
+				})
+   		</script>
+   		<style> 
+			body {
+				margin-left: 0px;
+				margin-top: 50px;
+				margin-right: 0px;
+				margin-bottom: 0px;
+				font-family: 微软雅黑;
+	 			font-size: 12px;	
+	    	}
+   	 	</style>
+	</head>  
+  	<body>
+  		<div style='width:1024px ; height: 500px; margin-right: auto; margin-left: auto; background-image:url("image/bg_2.png")';>
+			<div style="text-align:center;position:relative;top:50px;">
+				<font size="6" color="blue">人脸识别登录</font>
+			</div>
+			<div style="position:relative;left:260px;top:50px;">
+				<div id="face_area" style="border:solid blue 2px;position:relative;left:160px;top:50px;width:160px;height:160px;z-index:1">
+				</div>
+				<video width="480" height="270" style="border:solid green 2px;position:relative;bottom:160px"></video>
+	    	</div>
+	    	<div style="position:relative;left:260px;bottom:90px">
+	    		请选择身份登录：
+	    		<input name="character" type="radio" value="teacher"/>教师
+				<input name="character" type="radio" value="parent"/>家长
+				<input name="character" type="radio" value="admin"/>管理员
+	    	</div>
+	    	<div style="color:blue;position:relative;left:260px;bottom:60px;">
+				说明：请使用Microsoft Edge浏览器打开,且确保将人脸置于蓝色框内
+			</div>
+	    	<div style="position:relative;left:550px;bottom:135px;">
+	        	<button id="upload">识别登录</button>&nbsp;&nbsp;
+	    		<a href="login_with_password.html">无法识别？试试账号密码登录</a>
+	    	</div>
+	    	<div style="position:relative;left:675px;bottom:135px;">
+	    		<a href="signup.html">尚未注册？点此注册</a>
+	    	</div>
+	    	<canvas style="display: none" width="320px" height="180px"></canvas>
+	    </div>
+	    <div style='text-align: center; font-family: "Times New Roman"; font-size: 16px; border-top-color: rgb(221, 221, 221); border-top-width: 1px; border-top-style: solid;'>
+		Copyright © 2018 HFUT. All rights reserved. 如有问题，请发送邮件至 1362133120@qq.com</div>
+  	</body>
+</html>

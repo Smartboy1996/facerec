@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>用户中心</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript">
+    	function getQueryString(name) { 
+	        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
+	        var r = window.location.search.substr(1).match(reg); 
+	        if (r != null) return unescape(r[2]); 
+	        return null; 
+        }
+    </script>
+
+  </head>
+  
+  <body>
+    	<div id="greeting">
+    		This is user_page.
+    	</div>
+  </body>
+  <script type="text/javascript">
+    	var username=getQueryString("username");
+    	var character=getQueryString("character");
+    	//alert("你好"+username);
+    	document.querySelector("#greeting").innerHTML="欢迎您："+username+",您的身份是:"+character;
+		//greeting.innerHTML="欢迎您："+username;
+  </script>
+</html>

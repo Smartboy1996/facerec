@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>信息采集与注册</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script type="text/javascript" src="jquery-3.3.1.min.js"></script>
+    <script type="text/javascript">
+    		$(document).ready(function(){
+    			// 获取媒体方法（旧方法）
+    			navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMeddia || navigator.msGetUserMedia;
+    			var video = document.querySelector("video"),
+        			mediaStreamTrack;
+    			// 获取媒体方法（新方法）
+    			// 使用新方法打开摄像头
+    			if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        			navigator.mediaDevices.getUserMedia({
+            			video: true,
+            			audio: false
+        			}).then(function(stream) {
+            			console.log(stream);
+            			mediaStreamTrack = typeof stream.stop === 'function' ? stream : stream.getTracks()[1];
+            			video.src = (window.URL || window.webkitURL).createObjectURL(stream);
+            			video.play();
+        			}).catch(function(err) {
+            			console.log(err);
+        			})
+    			}
+    			// 使用旧方法打开摄像头
+    			else if (navigator.getMedia) {
+        			navigator.getMedia({
+            			video: true
+        			}, function(stream) {
+            		mediaStreamTrack = stream.getTracks()[0];
+
+            		video.src = (window.URL || window.webkitURL).createObjectURL(stream);
+            		video.play();
+        			}, function(err) {
+            			console.log(err);
+        			});
+    			}
+    		})
+   	</script>
+    <script type="text/javascript">
+    	function submit(){
+    		var username=$("#username").val(),
+    			password=$("#password").val(),
+    			password2=$("#password2").val(),
+    			valicode=$("#valicode").val(),
+    			canvas = document.querySelector("canvas");
+    		if(username==""||password==""){
+    			alert("账号和密码不能为空");
+    			return;
+    		}else if(password!=password2){
+    			alert("两次输入的密码不一致");
+    			return;
+    		}else if(valicode==""){
+    			alert("请输入验证码");
+    			return;
+    		}else{
+    			$.post(
+    				"servlet/SignupVerify",
+    				{
+    					username:username,
+    					password:password,
+    					snapData: canvas.toDataURL('image/png'),
+    					valicode:valicode
+    				},
+    				function(rs){
+  						if(rs=="success"){
+  							//window.location.href="signup_success.html"
+  						}else if(rs=="fail"){
+  							alert("该账号已经被注册");
+  						}else if(rs=="error"){
+  							alert("注册失败，没有检测到人脸")
+  						}
+    				}
+ 				).fail(
+ 					function(){
+ 						alert("fail");
+ 					}
+ 				)
+    		}
+
+    	}
+    	function snapshot(){
+    		var canvas = document.querySelector("canvas"),
+    		video=document.querySelector("video"),
+        	context = canvas.getContext('2d');
+    		context.drawImage(video, 0, 0, 320, 180);
+    	}
+    </script>
+    <style> 
+		body {
+			margin-left: 0px;
+			margin-top: 50px;
+			margin-right: 0px;
+			margin-bottom: 0px;
+			font-family: 微软雅黑;
+ 			font-size: 12px;	
+    	}
+    </style>
+  </head>
+  <body>
+  	<div style='width:1024px ; height: 500px; margin-right: auto; margin-left: auto; background-image:url("image/bg_3.png")';>
+		<div id="webcam_video" style="position:relative;top:140px">
+			<div>图像采集:</div>
+			<div><video width="320" height="180" style="border:1 solid black;"></video></div>
+			<div id="face_area" style="border:solid blue 2px;position:relative;left:107px;bottom:146px;width:107px;height:107px;z-index:1">
+			</div>	
+		</div>
+		<div id="links" style="position:relative;top:33px;left:50px">
+			<a href="login_with_password.html">已有账号？使用账号密码登录</a>
+			&nbsp;&nbsp;或者&nbsp;&nbsp;<a href="login_with_facerec.html">使用人脸登录</a>
+		</div>
+		<div id="signup_form" style="position:relative;left:500px;bottom:300px;">
+			请填写以下注册信息:<br/>
+			<table style="border:1px ridge">
+				<tr>
+					<td width="58px">用户名:</td>
+					<td width="262px">
+						<input type="text" id="username" style="width: 230px; height: 16px;" size="30"/>
+					</td>
+				</tr>
+				<tr>
+					<td>密&nbsp;&nbsp;码:</td>
+					<td>
+						<input type="password" id="password" style="width: 230px; height: 16px;" size="30"/>
+					</td>
+				</tr>
+				<tr>
+					<td>确认密码:</td>
+					<td>
+						<input type="password" id="password2" style="width: 230px; height: 16px;" size="30"/>
+					</td>
+				</tr>
+				<tr>
+					<td>人脸信息:</td>
+					<td>
+						<canvas width="320" height="180" style="border:1 solid black;"></canvas>
+						<div id="face_area" style="border:solid blue 2px;position:relative;left:107px;bottom:146px;width:107px;height:107px;z-index:1">
+						</div>	
+					</td>
+				</tr>
+				<tr>
+					<td style="position:relative;bottom:100px">验证码:</td>
+					<td style="position:relative;bottom:100px">
+						<input type="text" id="valicode" style="width: 105px; height: 16px;position:relative;bottom:10px" size="30"/>
+						<img width="120" height="30" src="/face_login/servlet/ValiImageServlet"/>
+					</td>
+					
+				</tr>
+				<tr>
+					<td colspan="2"  style="position:relative;bottom:100px">
+						<input type="button" value="截取图像" onclick="snapshot()"/>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="button" value="提交" onclick="submit()"/>
+					</td>
+				</tr>
+			</table>
+			<div style="color:blue;position:relative;bottom:90px">
+				说明：请使用Microsoft Edge浏览器打开
+				<br/>填写好账号密码后，点击截取图像，
+				<br/>确保将人脸置于蓝色框内，最后再点击提交注册。
+				<br/>只会保存框内图像用于匹配。
+			</div>
+		</div>
+	</div>
+	<div style='text-align: center; font-family: "Times New Roman"; font-size: 16px; border-top-color: rgb(221, 221, 221); border-top-width: 1px; border-top-style: solid;'>
+		Copyright © 2018 HFUT. All rights reserved. 如有问题，请发送邮件至 1362133120@qq.com</div>
+  </body>
+</html>
